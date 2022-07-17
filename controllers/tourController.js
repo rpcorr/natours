@@ -4,6 +4,17 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkBody = (req, res, next, val) => {
+  //see if there is a tour body
+  if (req.params.body.length == 0) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Tour doesn\'t contains a body',
+    });
+  }
+  next();
+}
+
 exports.checkID = (req, res, next, val) => {
   console.log(`Tour id is: ${val}`);
   // see if there is a tour
