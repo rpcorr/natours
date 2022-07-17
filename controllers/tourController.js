@@ -4,12 +4,12 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
-exports.checkBody = (req, res, next, val) => {
+exports.checkBody = (req, res, next) => {
   //see if there is a tour body
-  if (req.params.body.length == 0) {
+  if (!req.body.name || !req.body.price) {
     return res.status(400).json({
       status: 'fail',
-      message: 'Tour doesn\'t contains a body',
+      message: 'Tour is missing name or price',
     });
   }
   next();
