@@ -1,0 +1,8 @@
+// MongoDB Playground
+
+// Select the database to use.
+use('natours-test');
+
+db.tours.updateMany( { price: {$gt: 500}, rating: {$gte: 4.8} }, { $set: {premium: true}})
+
+db.tours.find()

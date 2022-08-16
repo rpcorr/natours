@@ -1,0 +1,7 @@
+// MongoDB Playground
+
+// Select the database to use.
+use('natours-test');
+
+db.tours.updateOne( {name: "The Snow Adventurer"}, { $set: {price: 597} })
+db.tours.find()
