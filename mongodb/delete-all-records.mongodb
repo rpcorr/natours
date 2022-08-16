@@ -1,0 +1,7 @@
+
+// Select the database to use.
+use('natours-test');
+
+
+db.tours.deleteMany({})
+db.tours.find()
