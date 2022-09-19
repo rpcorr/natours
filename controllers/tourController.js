@@ -6,10 +6,34 @@ const Tour = require('./../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
+
+    // BUILD QUERY
+    const queryObj = {...req.query}; // creates a copy of the query object
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+
+    // remove excludedFields from queryObj
+    excludedFields.forEach(el => delete queryObj[el]);
+
     //console.log(req.requestTime);
+    console.log(req.query, queryObj);
 
-    const tours = await Tour.find();
+    // const tours = await Tour.find({
+    //   duration: 5,
+    //   difficulty: 'easy'
+    // });
 
+    const query = Tour.find(queryObj);
+
+    // const query = await Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+
+    // EXECUTE QUERY
+    const tours = await query;
+
+    // SEND RESPONSE
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -75,7 +99,7 @@ exports.updateTour = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: {
-        tour
+        tour,
       },
     });
   } catch (err) {
@@ -88,7 +112,6 @@ exports.updateTour = async (req, res) => {
 
 exports.deleteTour = async (req, res) => {
   try {
-
     await Tour.findByIdAndDelete(req.params.id);
 
     res.status(204).json({
@@ -101,5 +124,4 @@ exports.deleteTour = async (req, res) => {
       message: err,
     });
   }
-  
 };
