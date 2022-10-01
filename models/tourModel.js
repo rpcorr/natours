@@ -57,8 +57,8 @@ const tourSchema = new mongoose.Schema(
     startDates: [Date],
     secretTour: {
       type: Boolean,
-      defaut: false
-    }
+      defaut: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -88,17 +88,26 @@ tourSchema.pre('save', function (next) {
 // });
 
 // QUERY MIDDLEWARE
-tourSchema.pre(/^find/, function(next) {  // includes all find methods
-//tourSchema.pre('find', function(next) {
-this.find({ secretTour: {$ne: true} })
-  
-this.start = Date.now();
-next();
+tourSchema.pre(/^find/, function (next) {
+  // includes all find methods
+  //tourSchema.pre('find', function(next) {
+  this.find({ secretTour: { $ne: true } });
+
+  this.start = Date.now();
+  next();
 });
 
-tourSchema.post(/^find/, function(docs, next) {
-  console.log(`Query took ${Date.now() - this.start} milliseconds!`)
-  console.log(docs);
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+  //console.log(docs);
+  next();
+});
+
+// AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: {$ne: true}}})
+
+  console.log(this.pipeline());
   next();
 });
 
