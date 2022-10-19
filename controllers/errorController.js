@@ -5,6 +5,16 @@ const handleCastErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleDuplicateFieldsDB = (err) => {
+  // stated in the course, but it did not work.
+  //const value = err.mesage.match(/(["'])(\\?.)*?\1/);
+  //const message = `Duplicate field value: x. Please use another value!`;
+
+  // alternative solution
+  const message = `Duplicate field value: ${Object.values(err.keyValue)}. Please use another value.`;
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -44,6 +54,7 @@ module.exports = (err, req, res, next) => {
     let error = Object.assign(err); // let error = { ...err }; this one is in the lecture but it is wrong. I found the solution in the comments
 
     if (error.name === 'CastError') error = handleCastErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
 
     sendErrorProd(error, res);
   }
