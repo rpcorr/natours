@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 userSchema.pre('save', async function (next) {
@@ -58,7 +63,13 @@ userSchema.pre('save', async function (next) {
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
-  this.passwordChangedAt = Date.now() - 1000;  // subtract 1000 because sometimes saving to the db is a bit slower than issuing the JSON Web Token making it so that the changed password timestamp is sometimes set a bit after the JSON Web Token has been created. Making the user will not be able to log in using the new token.
+  this.passwordChangedAt = Date.now() - 1000; // subtract 1000 because sometimes saving to the db is a bit slower than issuing the JSON Web Token making it so that the changed password timestamp is sometimes set a bit after the JSON Web Token has been created. Making the user will not be able to log in using the new token.
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  // this points to the current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
