@@ -11,7 +11,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       maxlength: [40, 'A tour name must have less or equal than 40 characters'],
-      minlength: [10, 'A tour name must have more or equal than 10 characters']
+      minlength: [10, 'A tour name must have more or equal than 10 characters'],
       //validate: [validator.isAlpha, 'Tour name must only contain characters']
     },
     slug: String,
@@ -28,14 +28,14 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a difficulty'],
       enum: {
         values: ['easy', 'medium', 'difficult'],
-        message: 'Difficulty is either easy, medium, difficult'
-      }
+        message: 'Difficulty is either easy, medium, difficult',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5,
       min: [1, 'Rating must be above or equal 1.0'],
-      max: [5, 'Rating must be equal or below 5.0']
+      max: [5, 'Rating must be equal or below 5.0'],
     },
     ratingsQuantity: {
       type: Number,
@@ -48,13 +48,12 @@ const tourSchema = new mongoose.Schema(
     priceDiscount: {
       type: Number,
       validate: {
-        validator: function(val) {
+        validator: function (val) {
           // this only points to current doc on NEW document creation
           return val < this.price;
         },
-        message:'Discount price ({VALUE}) should be below the regular price'
-      }
-      
+        message: 'Discount price ({VALUE}) should be below the regular price',
+      },
     },
     summary: {
       type: String,
@@ -85,37 +84,42 @@ const tourSchema = new mongoose.Schema(
       type: {
         type: String,
         default: 'Point',
-        enum: ['Point']
+        enum: ['Point'],
       },
       coordinates: [Number],
       address: String,
-      description: String
+      description: String,
     },
     locations: [
       {
         type: {
           type: String,
           default: 'Point',
-          enum: ['Point']
+          enum: ['Point'],
         },
         coordinates: [Number],
         address: String,
         description: String,
         day: Number,
-      }
+      },
     ],
     guides: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: 'User'
-      }
-    ]
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
+
+// INDEXES
+//tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
 
 // VIRTUAL PROPERTIES
 tourSchema.virtual('durationWeeks').get(function () {
@@ -126,8 +130,8 @@ tourSchema.virtual('durationWeeks').get(function () {
 tourSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'tour',
-  localField: '_id'
-})
+  localField: '_id',
+});
 
 // DOCUMENT MIDDLEWARE: run before the .save() command and .create() command, but not on .insertMany() command
 tourSchema.pre('save', function (next) {
@@ -162,13 +166,13 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-tourSchema.pre(/^find/, function(next) {
+tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guides',
-    select: '-__v -passwordChangedAt'
+    select: '-__v -passwordChangedAt',
   });
-  
-  next()
+
+  next();
 });
 
 tourSchema.post(/^find/, function (docs, next) {
@@ -179,7 +183,7 @@ tourSchema.post(/^find/, function (docs, next) {
 
 // AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: {$ne: true}}})
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
   console.log(this.pipeline());
   next();
