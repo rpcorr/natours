@@ -6,5 +6,6 @@ const router = express.Router();
 // mount the routers
 router.get('/', viewController.getOverview);
 router.get('/tour/:slug', viewController.getTour);
+router.get('/login', viewController.getLoginForm);
 
 module.exports = router;
